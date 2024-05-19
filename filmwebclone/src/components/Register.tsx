@@ -19,6 +19,7 @@ export default function Register() {
   };
   return (
     <form
+      autoComplete="off"
       className="flex flex-col gap-4 size-fit m-4 text-4xl  text-white"
       onSubmit={(e: FormEvent) => {
         e.preventDefault();

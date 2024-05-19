@@ -1,9 +1,11 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Button from "./SubmitFormButton";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [inputs, setInputs] = useState({ userName: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -16,11 +18,16 @@ export default function Login() {
   };
   return (
     <form
+      autoComplete="off"
       className="flex flex-col gap-4 size-fit m-4 text-4xl  text-white"
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
         console.log(inputs);
         //api fetch here
+
+        if (true) {
+          navigate("/mainpage");
+        }
       }}
     >
       <div className="flex w-full justify-between">
