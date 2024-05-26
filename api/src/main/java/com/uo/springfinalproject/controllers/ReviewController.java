@@ -1,8 +1,11 @@
 package com.uo.springfinalproject.controllers;
 
+import com.uo.springfinalproject.DTO.ReviewDTO;
+import com.uo.springfinalproject.DTO.ReviewResponseDTO;
 import com.uo.springfinalproject.models.Review;
 import com.uo.springfinalproject.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -14,8 +17,9 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @PostMapping
-    public Review addReview(@RequestBody Review review) {
-        return reviewService.add(review);
+    public ResponseEntity<ReviewResponseDTO> addReview(@RequestBody ReviewDTO reviewDTO) {
+        ReviewResponseDTO createdReview = reviewService.createReview(reviewDTO);
+        return ResponseEntity.ok(createdReview);
     }
 
     @GetMapping("/{id}")

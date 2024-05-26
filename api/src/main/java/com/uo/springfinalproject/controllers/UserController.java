@@ -13,11 +13,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
-    public User addUser(@RequestBody User user) {
-        return userService.add(user);
-    }
-
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
         return userService.getById(id);

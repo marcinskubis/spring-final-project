@@ -1,8 +1,11 @@
 package com.uo.springfinalproject.controllers;
 
+import com.uo.springfinalproject.DTO.MovieDTO;
+import com.uo.springfinalproject.DTO.MovieResponseDTO;
 import com.uo.springfinalproject.models.Movie;
 import com.uo.springfinalproject.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -14,8 +17,9 @@ public class MovieController {
     private MovieService movieService;
 
     @PostMapping
-    public Movie addMovie(@RequestBody Movie movie) {
-        return movieService.add(movie);
+    public ResponseEntity<MovieResponseDTO> addMovie(@RequestBody MovieDTO movieDTO) {
+        MovieResponseDTO createdMovie = movieService.createMovie(movieDTO);
+        return ResponseEntity.ok(createdMovie);
     }
 
     @GetMapping("/{id}")
