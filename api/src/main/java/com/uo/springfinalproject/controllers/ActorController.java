@@ -1,8 +1,10 @@
 package com.uo.springfinalproject.controllers;
 
-import com.uo.springfinalproject.models.Actor;
+import com.uo.springfinalproject.DTO.ActorDTO;
+import com.uo.springfinalproject.DTO.ActorResponseDTO;
 import com.uo.springfinalproject.services.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,29 +17,36 @@ public class ActorController {
     private ActorService actorService;
 
     @PostMapping
-    public Actor addActor(@RequestBody Actor actor) {
-        return actorService.add(actor);
+    public ResponseEntity<ActorResponseDTO> addActor(@RequestBody ActorDTO actorDTO) {
+        ActorResponseDTO createdActor = actorService.createActor(actorDTO);
+        return ResponseEntity.ok(createdActor);
     }
 
     @GetMapping("/{id}")
-    public Actor getActorById(@PathVariable Long id) {
-        return actorService.getById(id);
+    public ResponseEntity<ActorResponseDTO> getActorById(@PathVariable Long id) {
+        ActorResponseDTO actor = actorService.getActorById(id);
+        return ResponseEntity.ok(actor);
     }
 
     @PutMapping("/{id}")
-    public Actor updateActor(@PathVariable Long id, @RequestBody Actor actor) {
-        actor.setId(id);
-        return actorService.edit(actor);
+    public ResponseEntity<ActorResponseDTO> updateActor(@PathVariable Long id, @RequestBody ActorDTO actorDTO) {
+        ActorResponseDTO updatedActor = actorService.updateActor(id, actorDTO);
+        return ResponseEntity.ok(updatedActor);
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteActor(@PathVariable Long id) {
-        Actor actor = actorService.getById(id);
-        return actorService.delete(actor);
+    public ResponseEntity<Void> deleteActor(@PathVariable Long id) {
+        boolean deleted = actorService.deleteActor(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/search")
-    public List<Actor> searchActors(@RequestParam String keyword) {
-        return actorService.findActorsByKeyword(keyword);
+    @GetMapping
+    public ResponseEntity<List<ActorResponseDTO>> getAllActors() {
+        List<ActorResponseDTO> actors = actorService.getAllActors();
+        return ResponseEntity.ok(actors);
     }
 }

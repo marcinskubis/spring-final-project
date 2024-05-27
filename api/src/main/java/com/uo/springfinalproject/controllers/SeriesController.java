@@ -1,9 +1,12 @@
 package com.uo.springfinalproject.controllers;
 
-import com.uo.springfinalproject.models.Series;
+import com.uo.springfinalproject.DTO.SeriesDTO;
+import com.uo.springfinalproject.DTO.SeriesResponseDTO;
 import com.uo.springfinalproject.services.SeriesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -14,29 +17,36 @@ public class SeriesController {
     private SeriesService seriesService;
 
     @PostMapping
-    public Series addSeries(@RequestBody Series series) {
-        return seriesService.add(series);
+    public ResponseEntity<SeriesResponseDTO> addSeries(@RequestBody SeriesDTO seriesDTO) {
+        SeriesResponseDTO createdSeries = seriesService.createSeries(seriesDTO);
+        return ResponseEntity.ok(createdSeries);
     }
 
     @GetMapping("/{id}")
-    public Series getSeriesById(@PathVariable Long id) {
-        return seriesService.getById(id);
+    public ResponseEntity<SeriesResponseDTO> getSeriesById(@PathVariable Long id) {
+        SeriesResponseDTO series = seriesService.getSeriesById(id);
+        return ResponseEntity.ok(series);
     }
 
     @PutMapping("/{id}")
-    public Series updateSeries(@PathVariable Long id, @RequestBody Series series) {
-        series.setId(id);
-        return seriesService.edit(series);
+    public ResponseEntity<SeriesResponseDTO> updateSeries(@PathVariable Long id, @RequestBody SeriesDTO seriesDTO) {
+        SeriesResponseDTO updatedSeries = seriesService.updateSeries(id, seriesDTO);
+        return ResponseEntity.ok(updatedSeries);
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteSeries(@PathVariable Long id) {
-        Series series = seriesService.getById(id);
-        return seriesService.delete(series);
+    public ResponseEntity<Void> deleteSeries(@PathVariable Long id) {
+        boolean deleted = seriesService.deleteSeries(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/search")
-    public List<Series> searchSeries(@RequestParam String keyword) {
-        return seriesService.findSeriesByKeyword(keyword);
+    @GetMapping
+    public ResponseEntity<List<SeriesResponseDTO>> getAllSeries() {
+        List<SeriesResponseDTO> seriesList = seriesService.getAllSeries();
+        return ResponseEntity.ok(seriesList);
     }
 }

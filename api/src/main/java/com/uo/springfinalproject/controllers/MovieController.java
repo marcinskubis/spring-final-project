@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/movies")
@@ -23,25 +24,43 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public Movie getMovieById(@PathVariable Long id) {
-        return movieService.getById(id);
+    public ResponseEntity<MovieResponseDTO> getMovieById(@PathVariable Long id) {
+        Movie movie = movieService.getById(id);
+        MovieResponseDTO movieDTO = new MovieResponseDTO(movie);
+        return ResponseEntity.ok(movieDTO);
     }
 
     @PutMapping("/{id}")
-    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
-        movie.setId(id);
-        return movieService.edit(movie);
+    public ResponseEntity<MovieResponseDTO> updateMovie(@PathVariable Long id, @RequestBody MovieDTO movieDTO) {
+        MovieResponseDTO updatedMovie = movieService.updateMovie(id, movieDTO);
+        return ResponseEntity.ok(updatedMovie);
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteMovie(@PathVariable Long id) {
-        Movie movie = movieService.getById(id);
-        return movieService.delete(movie);
+    public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+        boolean deleted = movieService.deleteById(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/search")
-    public List<Movie> searchMovies(@RequestParam String keyword) {
-        return movieService.findMoviesByKeyword(keyword);
+    public ResponseEntity<List<MovieResponseDTO>> searchMovies(@RequestParam String keyword) {
+        List<Movie> movies = movieService.findMoviesByKeyword(keyword);
+        List<MovieResponseDTO> movieResponseDTOs = movies.stream()
+                .map(MovieResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(movieResponseDTOs);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MovieResponseDTO>> getAllMovies() {
+        List<Movie> movies = movieService.getAllMovies();
+        List<MovieResponseDTO> movieResponseDTOs = movies.stream()
+                .map(MovieResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(movieResponseDTOs);
     }
 }
-

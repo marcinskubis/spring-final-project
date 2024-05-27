@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class MovieService extends GenericService<Movie, MovieRepository>{
+public class MovieService extends GenericService<Movie, MovieRepository> {
+
     @Autowired
     private DirectorRepository directorRepository;
 
     @Autowired
     private ActorRepository actorRepository;
+
     @Transactional(readOnly = true)
     public List<Movie> findMoviesByKeyword(String keyword) {
         return getRepo().findByTitleContainingIgnoreCase(keyword);
@@ -49,5 +51,48 @@ public class MovieService extends GenericService<Movie, MovieRepository>{
 
         Movie savedMovie = getRepo().save(movie);
         return new MovieResponseDTO(savedMovie);
+    }
+
+    @Transactional
+    public MovieResponseDTO updateMovie(Long id, MovieDTO movieDTO) {
+        Movie movie = getRepo().findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+        movie.setTitle(movieDTO.getTitle());
+        movie.setDescription(movieDTO.getDescription());
+        movie.setReleaseDate(movieDTO.getReleaseDate());
+
+        Director director = directorRepository.findById(movieDTO.getDirectorId())
+                .orElseThrow(() -> new RuntimeException("Director not found"));
+        movie.setDirector(director);
+
+        Set<Actor> actors = new HashSet<>();
+        for (Long actorId : movieDTO.getActorIds()) {
+            Actor actor = actorRepository.findById(actorId)
+                    .orElseThrow(() -> new RuntimeException("Actor not found"));
+            actors.add(actor);
+        }
+        movie.setActors(actors);
+
+        Movie updatedMovie = getRepo().save(movie);
+        return new MovieResponseDTO(updatedMovie);
+    }
+
+    @Transactional
+    public boolean deleteById(Long id) {
+        Movie movie = getRepo().findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+        getRepo().delete(movie);
+        return true;
+    }
+
+    @Transactional(readOnly = true)
+    public Movie getById(Long id) {
+        return getRepo().findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Movie> getAllMovies() {
+        return getRepo().findAll();
     }
 }

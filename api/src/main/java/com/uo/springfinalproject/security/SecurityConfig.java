@@ -4,6 +4,7 @@ import com.uo.springfinalproject.services.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,22 +29,26 @@ public class SecurityConfig {
     private JwtRequestFilter jwtRequestFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request->request
+                .authorizeHttpRequests(request -> request
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users/**").hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/movies/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/movies/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/movies/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/series/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/series/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/series/**").hasAuthority("ADMIN")
                         .requestMatchers("/movies/**").permitAll()
                         .requestMatchers("/actors/**").permitAll()
                         .requestMatchers("/directors/**").permitAll()
                         .requestMatchers("/reviews/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/series/**").permitAll()
                         .anyRequest().authenticated())
-                .sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(
-                        jwtRequestFilter, UsernamePasswordAuthenticationFilter.class
-                );
+                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 
