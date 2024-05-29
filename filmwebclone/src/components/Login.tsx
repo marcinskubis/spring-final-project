@@ -23,7 +23,26 @@ export default function Login() {
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
         console.log(inputs);
-        //api fetch here
+
+        try {
+          fetch("http://localhost:8080/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: "123",
+              password: "123",
+            }),
+            credentials: "include",
+            mode: "no-cors",
+          }).then(async (res) => {
+            res = await res.json();
+            console.log(res);
+          });
+        } catch (e) {
+          console.log(e);
+        }
 
         if (true) {
           navigate("/mainpage");
