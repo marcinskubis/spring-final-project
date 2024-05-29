@@ -39,6 +39,7 @@ export default function Login() {
             const r = await res.json();
             if (r.statusCode === 200) {
               sessionStorage.setItem("token", JSON.stringify(r.token));
+              sessionStorage.setItem("role", JSON.stringify(r.role));
               navigate("/mainpage");
             }
           });

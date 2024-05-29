@@ -25,6 +25,28 @@ export default function Register() {
         e.preventDefault();
         console.log(inputs);
         //api fetch here
+        try {
+          fetch("http://localhost:8080/auth/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: inputs.userName,
+              email: inputs.email,
+              password: inputs.password,
+              role: "NOTADMIN",
+            }),
+            mode: "cors",
+          }).then(async (res) => {
+            const r = await res.json();
+            if (r.statusCode === 200) {
+              console.log("succesfully registered!");
+            }
+          });
+        } catch (e) {
+          console.log(e);
+        }
       }}
     >
       <div>Register</div>
