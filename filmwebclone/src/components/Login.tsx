@@ -31,21 +31,19 @@ export default function Login() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              username: "123",
-              password: "123",
+              username: inputs.userName,
+              password: inputs.password,
             }),
-            credentials: "include",
             mode: "cors",
           }).then(async (res) => {
-            res = await res.json();
-            console.log(res);
+            const r = await res.json();
+            if (r.statusCode === 200) {
+              sessionStorage.setItem("token", JSON.stringify(r.token));
+              navigate("/mainpage");
+            }
           });
         } catch (e) {
           console.log(e);
-        }
-
-        if (true) {
-          navigate("/mainpage");
         }
       }}
     >
