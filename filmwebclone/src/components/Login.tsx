@@ -35,7 +35,7 @@ export default function Login() {
               password: "123",
             }),
             credentials: "include",
-            mode: "no-cors",
+            mode: "cors",
           }).then(async (res) => {
             res = await res.json();
             console.log(res);
