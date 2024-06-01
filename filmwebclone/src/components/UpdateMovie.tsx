@@ -9,24 +9,18 @@ type D = {
 };
 
 type I = {
+  id: number;
   title: string;
   description: string;
   releaseDate: Date;
-  directorId: number;
-  actorIds: number[];
+  directorName: string;
+  actorNames: string[];
 };
-
-export default function AddMovieComp({ hide, setMovies }: any) {
+export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
   const [directors, setDirectors] = useState<D[]>([]);
   const [actors, setActors] = useState<D[]>([]);
   const [addedActors, setAddedActors] = useState<number[]>([]);
-  const [inputs, setInputs] = useState<I>({
-    title: "",
-    description: "",
-    releaseDate: new Date(),
-    directorId: 0,
-    actorIds: [],
-  });
+  const [inputs, setInputs] = useState<I>(movieItem);
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setInputs((prevVal) => {
@@ -36,7 +30,6 @@ export default function AddMovieComp({ hide, setMovies }: any) {
       };
     });
   };
-
   useEffect(() => {
     try {
       fetch("http://localhost:8080/directors", {
@@ -78,55 +71,48 @@ export default function AddMovieComp({ hide, setMovies }: any) {
       console.log(e);
     }
   }, []);
-
-  useEffect(() => {
-    console.log("dir", directors);
-    console.log("act", actors);
-    console.log("inputs", inputs);
-    console.log("addedActors", addedActors);
-  }, [directors, actors, inputs, addedActors]);
   return (
     <form
       autoComplete="off"
-      className="flex flex-col justify-center items-center fixed gap-4 text-4xl  text-white w-screen h-screen bg-[#000000EF]"
+      className="flex flex-col justify-center items-center fixed gap-4 text-4xl  text-white w-screen h-screen bg-[#00000000] top-0 left-0 z-50"
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
         console.log(inputs);
-        //api fetch here
-        try {
-          fetch("http://localhost:8080/movies", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${JSON.parse(
-                sessionStorage.getItem("token")!
-              )}`,
-            },
-            body: JSON.stringify({
-              title: inputs.title,
-              description: inputs.description,
-              releaseDate: inputs.releaseDate,
-              directorId: inputs.directorId,
-              actorIds: addedActors,
-            }),
-            mode: "cors",
-          })
-            .then(async (res) => {
-              const r = await res.json();
-              return r;
-            })
-            .then((response) => {
-              console.log(response);
-              setMovies((prevMovies: any) => {
-                return [...prevMovies, response];
-              });
-            });
-        } catch (e) {
-          console.log(e);
-        }
+        // try {
+        //   fetch("http://localhost:8080/movies", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       Authorization: `Bearer ${JSON.parse(
+        //         sessionStorage.getItem("token")!
+        //       )}`,
+        //     },
+        //     body: JSON.stringify({
+        //       title: inputs.title,
+        //       description: inputs.description,
+        //     //api fetch here
+        //   releaseDate: inputs.releaseDate,
+        //       directorId: inputs.directorId,
+        //       actorIds: addedActors,
+        //     }),
+        //     mode: "cors",
+        //   })
+        //     .then(async (res) => {
+        //       const r = await res.json();
+        //       return r;
+        //     })
+        //     .then((response) => {
+        //       console.log(response);
+        //       setMovies((prevMovies: any) => {
+        //         return [...prevMovies, response];
+        //       });
+        //     });
+        // } catch (e) {
+        //   console.log(e);
+        // }
       }}
     >
-      <div className="flex flex-col relative justify-center items-center size-full ">
+      <div className="flex flex-col relative justify-center items-center  size-full ">
         <button
           type="button"
           className="flex top-4 right-4 absolute items-center justify-center border-2 rounded-full size-10"
@@ -147,9 +133,9 @@ export default function AddMovieComp({ hide, setMovies }: any) {
             />
           </svg>
         </button>
-        <div className="flex flex-col relative items-center w-fit min-w-[65%] h-[60%] gap-4 border p-12 rounded-2xl bg-slate-900  overflow-y-auto">
+        <div className="flex flex-col relative items-center  min-w-[70%] min-h-[70%] gap-4 border p-12 rounded-2xl bg-slate-900  overflow-y-auto">
           <div className="flex justify-between w-64">
-            <div>Add movie</div>
+            <div>Update Movie</div>
           </div>
           <label htmlFor="title">
             <input
@@ -158,6 +144,7 @@ export default function AddMovieComp({ hide, setMovies }: any) {
               type="text"
               className=" outline-none text-[1rem] rounded-md text-black px-4 w-64"
               onChange={handleChange}
+              value={movieItem.title}
             />
           </label>
           <label htmlFor="description">
@@ -168,6 +155,7 @@ export default function AddMovieComp({ hide, setMovies }: any) {
               placeholder="Enter Movie Description"
               className=" outline-none text-[1rem] rounded-md text-black p-4 w-64 resize-none leading-6"
               onChange={handleChange}
+              value={movieItem.description}
             ></textarea>
           </label>
           <label htmlFor="releaseDate" className=" text-lg">
@@ -179,6 +167,9 @@ export default function AddMovieComp({ hide, setMovies }: any) {
             placeholder="Enter Movie Release Date"
             className=" outline-none text-[1rem] rounded-md text-black px-4 w-64"
             onChange={handleChange}
+            value={new Date(inputs.releaseDate).toLocaleString("en-GB", {
+              timeZone: "UTC",
+            })}
           />
           <select
             className="w-64 outline-none text-lg h-10 bg-transparent border px-2"
@@ -197,9 +188,15 @@ export default function AddMovieComp({ hide, setMovies }: any) {
             }}
           >
             <option>Choose Director</option>
-            {directors.map((item) => (
-              <option key={item.id}>{item.name}</option>
-            ))}
+            {directors.map((item) =>
+              item.name === inputs.directorName ? (
+                <option key={item.id}>{item.name}</option>
+              ) : (
+                <option key={item.id} selected>
+                  {item.name}
+                </option>
+              )
+            )}
           </select>
           <div className="flex flex-col overflow-y-auto min-h-44 max-h-44 w-64 border p-2">
             {actors.map((item) => (
@@ -223,6 +220,11 @@ export default function AddMovieComp({ hide, setMovies }: any) {
                       });
                     }
                   }}
+                  checked={
+                    inputs.actorNames.find((element) => element === item.name)
+                      ? true
+                      : false
+                  }
                 />
                 <label htmlFor={item.name}>{item.name}</label>
               </div>

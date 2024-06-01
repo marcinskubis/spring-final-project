@@ -1,0 +1,18 @@
+.grad-1 {
+  background-image: repeating-linear-gradient(
+    45deg,
+    #000,
+    #000 10px,
+    #fff 10px,
+    #fff 20px
+  );
+}
+.grad-2 {
+  background-image: repeating-linear-gradient(
+    135deg,
+    #000,
+    #000 10px,
+    #fff 10px,
+    #fff 20px
+  );
+}

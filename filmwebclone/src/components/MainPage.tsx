@@ -1,12 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddMovieComp from "./AddMovieComp";
 import MovieCart from "./MovieCard";
 
 export default function MainPage() {
   const [showTemplate, setShowTemplate] = useState<boolean>(false);
+  const [movies, setMovies] = useState<I[]>([]);
+  type I = {
+    id: number;
+    title: string;
+    description: string;
+    releaseDate: Date;
+    directorName: string;
+    actorNames: string[];
+  };
+  useEffect(() => {
+    try {
+      fetch("http://localhost:8080/movies", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        mode: "cors",
+      })
+        .then(async (res) => {
+          const r = await res.json();
+          return r;
+        })
+        .then((response: I[]) => {
+          setMovies(response);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
   return (
     <div className="flex flex-col relative text-3xl text-white gap-2 items-center w-full min-h-screen">
-      <div className="flex flex-col w-fit h-full">
+      <div className="flex flex-col w-full h-full">
         <div className="flex items-center justify-between w-full my-4 px-8">
           <div>Movies</div>
           {(JSON.parse(sessionStorage.getItem("role")!) === "ADMIN" ||
@@ -21,13 +51,20 @@ export default function MainPage() {
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 justify-center mt-20 border h-full p-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((item) => (
-            <MovieCart key={item} />
+        <div className="flex flex-wrap gap-8 justify-center mt-20 h-full p-6">
+          {movies.map((item) => (
+            <MovieCart
+              key={item.id}
+              movieItem={item}
+              movies={movies}
+              setMovies={setMovies}
+            />
           ))}
         </div>
       </div>
-      {showTemplate && <AddMovieComp hide={setShowTemplate} />}
+      {showTemplate && (
+        <AddMovieComp hide={setShowTemplate} setMovies={setMovies} />
+      )}
     </div>
   );
 }
