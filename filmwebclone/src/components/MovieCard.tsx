@@ -18,13 +18,13 @@ type Props = {
 export default function MovieCart({ movieItem, movies, setMovies }: Props) {
   const [movieInfo, setMovieInfo] = useState<boolean>(false);
   return (
-    <div className="flex flex-col size-72 bg-black justify-start items-center rounded-lg text-white text-lg border-2 border-white break-words">
+    <div className="flex flex-col size-80 bg-black justify-start items-center rounded-lg text-white text-lg border-2 border-white break-words">
       <div className="flex  w-full h-4 grad-1"></div>
       <div className="flex  w-full h-4 grad-2"></div>
-      <div className="flex justify-center font-bold mt-4 text-2xl text-yellow-400 w-full text-center break-words">
+      <div className=" inline-block line-clamp-1 font-bold mt-4 text-2xl text-yellow-400 text-center break-words w-full px-4 mt-4">
         {movieItem.title.toUpperCase()}
       </div>
-      <div className="flex justify-center px-2 line-clamp-2 mt-4 text-center  break-words">
+      <div className="inline-block w-full line-clamp-2  break-words px-4 mt-2">
         {movieItem.description}
       </div>
       <div className="flex text-base w-full px-2 mt-6">
