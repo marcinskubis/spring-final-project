@@ -120,6 +120,7 @@ export default function AddMovieComp({ hide, setMovies }: any) {
               setMovies((prevMovies: any) => {
                 return [...prevMovies, response];
               });
+              hide(false);
             });
         } catch (e) {
           console.log(e);
@@ -173,13 +174,15 @@ export default function AddMovieComp({ hide, setMovies }: any) {
           <label htmlFor="releaseDate" className=" text-lg">
             Enter Movie Release Date
           </label>
-          <input
-            name="releaseDate"
-            type="date"
-            placeholder="Enter Movie Release Date"
-            className=" outline-none text-[1rem] rounded-md text-black px-4 w-64"
-            onChange={handleChange}
-          />
+          <div>
+            <input
+              name="releaseDate"
+              type="date"
+              placeholder="Enter Movie Release Date"
+              className=" outline-none text-[1rem] rounded-md text-black px-4 w-64"
+              onChange={handleChange}
+            />
+          </div>
           <select
             className="w-64 outline-none text-lg h-10 bg-transparent border px-2"
             onChange={(e) => {

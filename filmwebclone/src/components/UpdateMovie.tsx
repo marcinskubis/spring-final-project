@@ -12,7 +12,7 @@ type I = {
   id: number;
   title: string;
   description: string;
-  releaseDate: Date;
+  releaseDate: string;
   directorName: string;
   actorNames: string[];
 };
@@ -21,6 +21,17 @@ export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
   const [actors, setActors] = useState<D[]>([]);
   const [addedActors, setAddedActors] = useState<number[]>([]);
   const [inputs, setInputs] = useState<I>(movieItem);
+
+  const getActorsIds = () => {
+    movieItem.actorNames.forEach((element: string) => {
+      actors.forEach((element2) => {
+        if (element === element2.name)
+          setAddedActors((prev) => {
+            return [...prev, element2.id];
+          });
+      });
+    });
+  };
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setInputs((prevVal) => {
@@ -30,6 +41,13 @@ export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
       };
     });
   };
+  useEffect(() => {
+    console.log("addedActors", addedActors);
+    console.log("inputs", inputs);
+  }, [inputs, addedActors]);
+  useEffect(() => {
+    getActorsIds();
+  }, [actors]);
   useEffect(() => {
     try {
       fetch("http://localhost:8080/directors", {
@@ -78,38 +96,45 @@ export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
         console.log(inputs);
-        // try {
-        //   fetch("http://localhost:8080/movies", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${JSON.parse(
-        //         sessionStorage.getItem("token")!
-        //       )}`,
-        //     },
-        //     body: JSON.stringify({
-        //       title: inputs.title,
-        //       description: inputs.description,
-        //     //api fetch here
-        //   releaseDate: inputs.releaseDate,
-        //       directorId: inputs.directorId,
-        //       actorIds: addedActors,
-        //     }),
-        //     mode: "cors",
-        //   })
-        //     .then(async (res) => {
-        //       const r = await res.json();
-        //       return r;
-        //     })
-        //     .then((response) => {
-        //       console.log(response);
-        //       setMovies((prevMovies: any) => {
-        //         return [...prevMovies, response];
-        //       });
-        //     });
-        // } catch (e) {
-        //   console.log(e);
-        // }
+        try {
+          fetch(`http://localhost:8080/movies/${inputs.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${JSON.parse(
+                sessionStorage.getItem("token")!
+              )}`,
+            },
+            body: JSON.stringify({
+              title: inputs.title,
+              description: inputs.description,
+              releaseDate: inputs.releaseDate,
+              directorId: directors.filter(
+                (element) => element.name === inputs.directorName
+              )[0].id,
+              actorIds: addedActors,
+            }),
+            mode: "cors",
+          })
+            .then(async (res) => {
+              const r = await res.json();
+              return r;
+            })
+            .then((response) => {
+              console.log(response);
+              setMovies((prevMovies: any) => {
+                return [
+                  ...prevMovies.filter(
+                    (element: I) => element.id !== inputs.id
+                  ),
+                  response,
+                ];
+              });
+              hide(false);
+            });
+        } catch (e) {
+          console.log(e);
+        }
       }}
     >
       <div className="flex flex-col relative justify-center items-center  size-full ">
@@ -144,7 +169,7 @@ export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
               type="text"
               className=" outline-none text-[1rem] rounded-md text-black px-4 w-64"
               onChange={handleChange}
-              value={movieItem.title}
+              value={inputs.title}
             />
           </label>
           <label htmlFor="description">
@@ -155,48 +180,49 @@ export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
               placeholder="Enter Movie Description"
               className=" outline-none text-[1rem] rounded-md text-black p-4 w-64 resize-none leading-6"
               onChange={handleChange}
-              value={movieItem.description}
+              value={inputs.description}
             ></textarea>
           </label>
           <label htmlFor="releaseDate" className=" text-lg">
             Enter Movie Release Date
           </label>
-          <input
-            name="releaseDate"
-            type="date"
-            placeholder="Enter Movie Release Date"
-            className=" outline-none text-[1rem] rounded-md text-black px-4 w-64"
-            onChange={handleChange}
-            value={new Date(inputs.releaseDate).toLocaleString("en-GB", {
-              timeZone: "UTC",
-            })}
-          />
+          <div className="">
+            <input
+              name="releaseDate"
+              type="date"
+              className="outline-none text-[1rem] rounded-md text-black px-4 w-64 "
+              onChange={handleChange}
+              value={inputs.releaseDate}
+            />
+          </div>
           <select
             className="w-64 outline-none text-lg h-10 bg-transparent border px-2"
             onChange={(e) => {
               const { value } = e.target;
-              const dirId = directors.find(
-                (element) => element.name == value
-              )?.id;
-              dirId &&
-                setInputs((prev) => {
-                  return {
-                    ...prev,
-                    directorId: dirId,
-                  };
-                });
+              setInputs((prev) => {
+                return {
+                  ...prev,
+                  directorName: value,
+                };
+              });
             }}
+            // defaultValue={}
           >
             <option>Choose Director</option>
             {directors.map((item) =>
               item.name === inputs.directorName ? (
-                <option key={item.id}>{item.name}</option>
+                <option key={item.id} value={item.name} selected>
+                  {item.name}
+                </option>
               ) : (
-                <option key={item.id} selected>
+                <option key={item.id} value={item.name}>
                   {item.name}
                 </option>
               )
             )}
+            {/* {directors.map((item) => (
+              <option key={item.id}>{item.name}</option>
+            ))} */}
           </select>
           <div className="flex flex-col overflow-y-auto min-h-44 max-h-44 w-64 border p-2">
             {actors.map((item) => (
@@ -221,7 +247,7 @@ export default function UpdateMovie({ hide, setMovies, movieItem }: any) {
                     }
                   }}
                   checked={
-                    inputs.actorNames.find((element) => element === item.name)
+                    addedActors.find((element) => element === item.id)
                       ? true
                       : false
                   }

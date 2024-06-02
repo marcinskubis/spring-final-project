@@ -5,7 +5,7 @@ type I = {
   id: number;
   title: string;
   description: string;
-  releaseDate: Date;
+  releaseDate: string;
   directorName: string;
   actorNames: string[];
 };
@@ -20,7 +20,7 @@ type Props = {
 export default function MovieInfo({
   hide,
   movieItem,
-  //   movies,
+  movies,
   setMovies,
 }: Props) {
   const [updateVisibility, setUpdateVisibility] = useState(false);
@@ -29,11 +29,14 @@ export default function MovieInfo({
       <div className="flex flex-col items-center rounded-xl min-w-[70%] min-h-[70%] bg-slate-900 border">
         <div className="flex justify-between w-full">
           {updateVisibility && (
-            <UpdateMovie hide={setUpdateVisibility} movieItem={movieItem} />
+            <UpdateMovie
+              hide={setUpdateVisibility}
+              movieItem={movieItem}
+              setMovies={setMovies}
+            />
           )}
           <div className="p-4">
-            {(JSON.parse(sessionStorage.getItem("role")!) === "ADMIN" ||
-              true) && (
+            {JSON.parse(sessionStorage.getItem("role")!) === "ADMIN" && (
               <div className="flex gap-2">
                 <button
                   className="flex justify-center items-center px-4 border-2 border-red-500 rounded-lg text-red-500"
@@ -100,9 +103,13 @@ export default function MovieInfo({
         <div className="text-5xl text-yellow-400">
           {movieItem.title.toLocaleUpperCase()}
         </div>
-        <div className="w-full px-16 mt-10">Description:</div>
-        <div className="w-full px-16 text-base mt-4 ">
-          {movieItem.description}
+        <div className="flex justify-between w-full px-16 mt-10">
+          <div>Description:</div>
+          <div>Release Date:</div>
+        </div>
+        <div className="flex justify-between w-full px-16 text-base mt-4 ">
+          <div>{movieItem.description}</div>
+          <div>{movieItem.releaseDate}</div>
         </div>
         <div className="w-full px-16 mt-10 opacity-50">Directed by:</div>
         <div className="w-full px-16 ">-{movieItem.directorName}</div>

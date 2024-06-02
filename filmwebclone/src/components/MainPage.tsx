@@ -9,7 +9,7 @@ export default function MainPage() {
     id: number;
     title: string;
     description: string;
-    releaseDate: Date;
+    releaseDate: string;
     directorName: string;
     actorNames: string[];
   };
@@ -39,8 +39,7 @@ export default function MainPage() {
       <div className="flex flex-col w-full h-full">
         <div className="flex items-center justify-between w-full my-4 px-8">
           <div>Movies</div>
-          {(JSON.parse(sessionStorage.getItem("role")!) === "ADMIN" ||
-            true) && (
+          {JSON.parse(sessionStorage.getItem("role")!) === "ADMIN" && (
             <button
               className="flex my-2 border-4 border-orange-700 rounded-lg text-base w-fit self-center px-4 py-2 bg-orange-500 hover:scale-110 ease-in-out duration-150"
               onClick={() => {
