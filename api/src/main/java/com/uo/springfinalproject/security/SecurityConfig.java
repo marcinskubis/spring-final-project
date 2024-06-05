@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/directors/**").permitAll()
                         .requestMatchers("/reviews/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/series/**").permitAll()
+                        .requestMatchers("/users/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

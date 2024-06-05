@@ -2,6 +2,7 @@ package com.uo.springfinalproject.controllers;
 
 import com.uo.springfinalproject.DTO.ReviewDTO;
 import com.uo.springfinalproject.DTO.ReviewResponseDTO;
+import com.uo.springfinalproject.DTO.SeriesResponseDTO;
 import com.uo.springfinalproject.models.Review;
 import com.uo.springfinalproject.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,24 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public Review getReviewById(@PathVariable Long id) {
-        return reviewService.getById(id);
+    public ReviewResponseDTO getReviewById(@PathVariable Long id) {
+        return reviewService.getReviewById(id);
     }
 
     @PutMapping("/{id}")
-    public Review updateReview(@PathVariable Long id, @RequestBody Review review) {
-        review.setId(id);
-        return reviewService.edit(review);
+    public ResponseEntity<ReviewResponseDTO> updateReview(@PathVariable Long id, @RequestBody ReviewDTO reviewDTO) {
+        ReviewResponseDTO updatedReview = reviewService.updateReview(id, reviewDTO);
+        return ResponseEntity.ok(updatedReview);
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteReview(@PathVariable Long id) {
-        Review review = reviewService.getById(id);
-        return reviewService.delete(review);
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+        boolean deleted = reviewService.deleteReview(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

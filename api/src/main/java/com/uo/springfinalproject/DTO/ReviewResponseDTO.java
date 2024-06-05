@@ -19,6 +19,11 @@ public class ReviewResponseDTO {
         this.setContent(review.getContent());
         this.setRating(review.getRating());
         this.setUserName(review.getUser().getUsername());
+        if(review.getMovie() != null) {
+            this.setMovieTitle(review.getMovie().getTitle());
+        } else {
+            this.setSeriesTitle(review.getSeries().getTitle());
+        }
     }
 }
 
